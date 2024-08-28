@@ -21,7 +21,6 @@ public class Item
     public int Mileage { get; set; }
     [Column("image_url")]
     public string ImageUrl { get; set; }
-
     // Navigate prop
     [Column("auction")]
     public Auction Auction { get; set; }

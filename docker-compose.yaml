@@ -11,6 +11,19 @@ services:
       - 9001:5432
     volumes:
       - pg_auction_server_data:/var/lib/postgresql/data
+
+  mongo_search_server:
+    container_name: mongo_serach_server
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root   
+      - MONGO_INITDB_ROOT_PASSWORD=mongopw
+    ports:
+      - 9002:27017
+    volumes:
+      - mongo_serach_server_data:/data/db
 volumes:
   pg_auction_server_data:
+    driver: local
+  mongo_serach_server_data:
     driver: local

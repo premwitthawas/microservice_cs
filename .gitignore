@@ -5,7 +5,7 @@
 
 # dotenv files
 .env
-
+CourseAssets
 # User-specific files
 *.rsuser
 *.suo

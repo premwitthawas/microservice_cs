@@ -5,6 +5,7 @@ using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,14 +25,15 @@ public class AuctionsController : ControllerBase
   }
 
   [HttpGet]
-  public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions()
+  public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions(string date)
   {
-    var auctions = await this._context.Auctions
-    .Include(x => x.Item)
-    .OrderBy(x => x.Item.Make)
-    .ToListAsync();
-    var res = this._mapper.Map<List<AuctionDto>>(auctions);
-    return res;
+    var query = this._context.Auctions.OrderBy(x => x.Item.Make).AsQueryable();
+    if (!string.IsNullOrEmpty(date))
+    {
+      query = query.Where(x => x.UpdaatedAt.CompareTo(DateTime.Parse(date).ToUniversalTime()) > 0);
+    }
+
+    return await query.ProjectTo<AuctionDto>(this._mapper.ConfigurationProvider).ToListAsync();
   }
 
   [HttpGet("{id}")]
@@ -82,7 +84,7 @@ public class AuctionsController : ControllerBase
 
     var result = await this._context.SaveChangesAsync() > 0;
 
-    if(result) return Ok();
+    if (result) return Ok();
 
     return BadRequest("Can't Updateing DB");
 
@@ -92,11 +94,11 @@ public class AuctionsController : ControllerBase
   public async Task<ActionResult> DeleteAuction(Guid id)
   {
     var auction = await this._context.Auctions.FindAsync(id);
-    if(auction == null) return NotFound();
+    if (auction == null) return NotFound();
     // TODO: check seller == username
     this._context.Auctions.Remove(auction);
     var result = await this._context.SaveChangesAsync() > 0;
-    if(!result) return BadRequest("Could not update DB");
+    if (!result) return BadRequest("Could not update DB");
     return Ok();
   }
 

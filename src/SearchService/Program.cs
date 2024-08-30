@@ -1,15 +1,33 @@
 
 using System.Net;
+using Contracts;
+using MassTransit;
 using Polly;
 using Polly.Extensions.Http;
+using SearchService.Consumer;
 using SearchService.Data;
+using SearchService.RequestHelpers;
 using SearchService.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(MappingProfiles));
 builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetPolicy());
-
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host("localhost", 5673, "/", host =>
+        {
+            host.Username("guest");
+            host.Password("guest");
+        });
+        cfg.ConfigureEndpoints(ctx);
+    });
+});
 var app = builder.Build();
 
 app.UseAuthorization();

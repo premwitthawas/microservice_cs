@@ -22,6 +22,12 @@ services:
       - 9002:27017
     volumes:
       - mongo_serach_server_data:/data/db
+  rabbitmq_server:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq_server
+    ports:
+      - 5673:5672
+      - 15672:15672
 volumes:
   pg_auction_server_data:
     driver: local

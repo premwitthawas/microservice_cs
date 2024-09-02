@@ -1,6 +1,8 @@
 @SearchService_HostAddress = http://localhost:5128
+@Identityservice_uri = http://localhost:5001
 
 GET {{SearchService_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+POST  {{Identityservice_uri}}/

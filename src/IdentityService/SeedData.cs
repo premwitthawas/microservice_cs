@@ -13,16 +13,15 @@ public class SeedData
     public static void EnsureSeedData(WebApplication app)
     {
         using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
 
         var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        if (userMgr.Users.Any()) return;
+
         var alice = userMgr.FindByNameAsync("alice").Result;
-
-        //FEED WHEN NO USER EXISTING
-        
-        if(userMgr.Users.Any()) return;
-
         if (alice == null)
         {
             alice = new ApplicationUser
@@ -38,7 +37,7 @@ public class SeedData
             }
 
             result = userMgr.AddClaimsAsync(alice, new Claim[]{
-                            new(JwtClaimTypes.Name, "Alice Smith"),
+                            new Claim(JwtClaimTypes.Name, "Alice Smith"),
                         }).Result;
             if (!result.Succeeded)
             {
@@ -67,7 +66,7 @@ public class SeedData
             }
 
             result = userMgr.AddClaimsAsync(bob, new Claim[]{
-                            new(JwtClaimTypes.Name, "Bob Smith"),
+                            new Claim(JwtClaimTypes.Name, "Bob Smith"),
                         }).Result;
             if (!result.Succeeded)
             {

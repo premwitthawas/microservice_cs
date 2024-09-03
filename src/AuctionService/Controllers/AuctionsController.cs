@@ -8,6 +8,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Contracts;
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -53,14 +54,14 @@ public class AuctionsController : ControllerBase
     var res = this._mapper.Map<AuctionDto>(auction);
     return res;
   }
-
+  [Authorize]
   [HttpPost]
   public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
   {
     // createdto -> auction
     var auction = this._mapper.Map<Auction>(createAuctionDto);
     // TODO: User Seller
-    auction.Seller = "Test User";
+    auction.Seller = User.Identity.Name;
 
     this._context.Auctions.Add(auction);
     var newAuction = this._mapper.Map<AuctionDto>(auction);
@@ -84,6 +85,8 @@ public class AuctionsController : ControllerBase
     if (auction == null) return NotFound();
     // TODO: check seller == username
 
+    if (auction.Seller != User.Identity.Name) return Forbid();
+
     auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
     auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
     auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
@@ -106,6 +109,7 @@ public class AuctionsController : ControllerBase
     var auction = await this._context.Auctions.FindAsync(id);
     if (auction == null) return NotFound();
     // TODO: check seller == username
+    if (auction.Seller != User.Identity.Name) return Forbid();
     this._context.Auctions.Remove(auction);
     await this._publishEndpoint.Publish<AuctionDeleted>(new { Id = auction.Id.ToString() });
     var result = await this._context.SaveChangesAsync() > 0;

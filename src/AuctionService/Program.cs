@@ -27,10 +27,10 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.Host("localhost", 5673, "/", host =>
+        cfg.Host(builder.Configuration["RabbitMQ:Host"], ushort.Parse(builder.Configuration["Rabbitmq:Port"]), "/", host =>
         {
-            host.Username("guest");
-            host.Password("guest");
+            host.Username(builder.Configuration.GetValue("RabbitMQ:Username", "guest"));
+            host.Password(builder.Configuration.GetValue("RabbitMQ:Password", "guest"));
         });
         cfg.ConfigureEndpoints(ctx);
     });
@@ -38,7 +38,8 @@ builder.Services.AddMassTransit(x =>
 
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options=> {
+.AddJwtBearer(options =>
+{
     options.Authority = builder.Configuration["IdentityServiceUrl"];
     options.RequireHttpsMetadata = false;
     options.TokenValidationParameters.ValidateAudience = false;

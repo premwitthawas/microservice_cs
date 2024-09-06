@@ -2,8 +2,8 @@
 import React from 'react'
 
 interface Props {
-    title: string;
-    subtitle: string;
+    title?: string;
+    subtitle?: string;
     center?: boolean;
 }
 

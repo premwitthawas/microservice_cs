@@ -1,18 +1,18 @@
-export type Auction = {
-  id: string;
-  reservePrice: number;
-  seller: string;
-  winner: string | null;
-  soldAmount: number;
-  currentHighBid: number;
-  createdAt: string;
-  auctionEnd: string;
-  updaatedAt: string;
-  status: string;
-  make: string;
-  model: string;
-  year: number;
-  color: string;
-  mileage: number;
-  imageUrl: string;
-};
+export interface Auction {
+  id: string
+  reservePrice: string
+  seller: string
+  winner: string
+  soldAmount: string
+  currentHighBid: string
+  createdAt: string
+  auctionEnd: string
+  updaatedAt: string
+  status: string
+  make: string
+  model: string
+  year: string
+  color: string
+  mileage: string
+  imageUrl: string
+}

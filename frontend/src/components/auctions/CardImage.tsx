@@ -3,18 +3,17 @@ import React, { useState } from 'react'
 import Image from "next/image";
 interface Props {
     imageUrl: string;
-    make: string
 }
-const CardImage = ({ imageUrl, make }: Props) => {
+const CardImage = ({ imageUrl }: Props) => {
     const [isLoading, setLoading] = useState<boolean>(true);
     return (
         <Image
             src={imageUrl}
-            alt={`image auctions of ${make}`}
-            fill
+            alt={'image'}
+            fill={true}
             priority
             className={
-                `object-cover group-hover:opacity-75 duration-700 ease-in-out 
+                `h-[100%] object-cover group-hover:opacity-75 duration-700 ease-in-out 
                 ${isLoading ? 
                     'grayscale blur-2xl scale-110' 
                     : 

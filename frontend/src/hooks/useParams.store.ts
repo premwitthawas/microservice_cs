@@ -7,6 +7,8 @@ export type ParamsState = {
   searchValue: string;
   orderBy: string;
   filterBy: string;
+  seller?: string;
+  winner?: string;
 };
 
 export type ParamsActions = {
@@ -22,7 +24,9 @@ const intialState: ParamsState = {
   searchTerm: "",
   searchValue: "",
   orderBy: "make",
-  filterBy: 'live'
+  filterBy: "live",
+  seller: undefined,
+  winner: undefined,
 };
 
 export type ParamsStore = ParamsState & ParamsActions;

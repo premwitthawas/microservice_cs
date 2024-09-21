@@ -1,4 +1,5 @@
 import NextAuth, { type DefaultSession, type Profile } from "next-auth";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type JWT } from "next-auth/jwt";
 import { OIDCConfig } from "next-auth/providers";
 import DuendeIDS6Provider from "next-auth/providers/duende-identity-server6";
@@ -8,9 +9,14 @@ declare module "next-auth" {
     user: {
       username: string;
     } & DefaultSession["user"];
+    accessToken: string;
   }
 
   interface Profile {
+    username: string;
+  }
+
+  interface User {
     username: string;
   }
 }
@@ -18,6 +24,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     username: string;
+    accessToken: string;
   }
 }
 
@@ -40,7 +47,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    jwt: ({ token, profile }) => {
+    jwt: ({ token, profile, account }) => {
+      if (account && account.access_token) {
+        token.accessToken = account.access_token;
+      }
       if (profile) {
         token.username = profile.username;
       }
@@ -49,6 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session: ({ session, token }) => {
       if (token) {
         session.user.username = token.username;
+        session.accessToken = token.accessToken;
       }
       return session;
     },

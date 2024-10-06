@@ -38,14 +38,40 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:7777
       - RabbitMQ__Host=rabbitmq_server
       - RabbitMQ__Port=5672
       - ConnectionStrings__DefaultConnection=Server=pg_auction_server;Port=5432;Database=auction_server;User Id=admin;Password=admin123
       - IdentityServiceUrl=http://identity_svc_server
+      - Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Kestrel__Endpoints__Grpc__Url=http://+:7777
+      - Kestrel__Endpoints__WebApi__Protocols=Http1
+      - Kestrel__Endpoints__WebApi__Url=http://+:80
     ports:
       - 7001:80
+      - 7777:7777
     depends_on:
       - pg_auction_server
+      - rabbitmq_server
+
+  bids_svc_server:
+    image: pzwitthawasdev/bidsservice:latest
+    build:
+      context: .
+      dockerfile: src/BiddingService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq_server
+      - RabbitMQ__Port=5672
+      - ConnectionStrings__DefaultConnection=mongodb://root:mongopw@mongo_search_server:27017
+      - IdentityServiceUrl=http://identity_svc_server
+      - GrpcAuction=http://auction_svc_server:7777
+    ports:
+      - 7003:80
+    depends_on:
+      - auction_svc_server
+      - mongo_search_server
       - rabbitmq_server
 
   serach_svc_server:
